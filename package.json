@@ -1,0 +1,11 @@
+{
+  "name": "langchain-bot",
+  "version": "1.0.0",
+  "description": "test bot built with langchain",
+  "main": "index.js",
+  "author": "Jennifer Yen <jennifer.yenjy@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "langchain": "^0.0.214"
+  }
+}
