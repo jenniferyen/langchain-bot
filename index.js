@@ -1,38 +1,39 @@
 import { ChatOpenAI } from "langchain/chat_models/openai"
 import { PromptTemplate } from "langchain/prompts"
+import { SupabaseVectorStore } from "langchain/vectorstores/supabase"
+import { OpenAIEmbeddings } from "langchain/embeddings/openai"
+import { createClient } from "@supabase/supabase-js"
+import { StringOutputParser } from 'langchain/schema/output_parser'
 
 document.addEventListener('submit', (e) => {
     e.preventDefault()
     progressConversation()
 })
 
-const openAIApiKey = import.meta.env.VITE_OPENAI_API_KEY;
+const openAIApiKey = import.meta.env.VITE_OPENAI_API_KEY
+
+const embeddings = new OpenAIEmbeddings({ openAIApiKey })
+const sbApiKey = import.meta.env.VITE_SUPABASE_API_KEY
+const sbUrl = import.meta.env.VITE_SUPABASE_URL_LC_CHATBOT
+const client = createClient(sbUrl, sbApiKey)
+
+const vectorStore = new SupabaseVectorStore(embeddings, {
+    client,
+    tableName: 'documents',
+    queryName: 'match_documents'
+})
+
+const retriever = vectorStore.asRetriever()
+
 const llm = new ChatOpenAI({ openAIApiKey })
 
-/**
- * Challenge:
- * 1. Create a prompt to turn a user's question into a 
- *    standalone question. (Hint: the AI understands 
- *    the concept of a standalone question. You don't 
- *    need to explain it, just ask for it.)
- * 2. Create a chain with the prompt and the model.
- * 3. Invoke the chain remembering to pass in a question.
- * 4. Log out the response.
- * **/
+const standaloneQuestionTemplate = 'Given a question, convert it to a standalone question. question: {question} standalone question:'
 
-// A string holding the phrasing of the prompt
-const standaloneQuestionTemplate = `Given a question, convert it to a standalone question.
-question: {question} standalone question:`
-
-// A prompt created using PromptTemplate and the fromTemplate method
 const standaloneQuestionPrompt = PromptTemplate.fromTemplate(standaloneQuestionTemplate)
 
-// Take the standaloneQuestionPrompt and PIPE the model
-const standaloneQuestionChain = standaloneQuestionPrompt.pipe(llm)
+const chain = standaloneQuestionPrompt.pipe(llm).pipe(new StringOutputParser()).pipe(retriever)
 
-// Await the response when you INVOKE the chain. 
-// Remember to pass in a question.
-const response = await standaloneQuestionChain.invoke({ 
+const response = await chain.invoke({
     question: `What kinds of courses does Scrimba offer? I'm looking to learn how to build AI apps and work with LLMs.`
 })
 
