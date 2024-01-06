@@ -5,4 +5,4 @@ To get started run
 1. `yarn install`
 2. `yarn start`
 
-![Screenshot](images/screenshot.png)
+<img src="images/screenshot.png" alt="screenshot" width="360">
