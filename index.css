@@ -28,10 +28,16 @@ main {
 
 .chatbot-container {
     background-color: #171f26;
-    width: 360px;
-    min-height: 380px;
+    width: 500px; /* Increased from 360px */
+    min-height: 500px; /* Increased from 380px */
     border-radius: var(--border-rad-lg);
     padding: 1em;  
+}
+
+.chatbot-conversation-container {
+    height: 400px; /* Increased from 250px */
+    overflow-y: scroll;
+    margin: 1em 0;
 }
 
 .chatbot-container > * {
@@ -42,16 +48,11 @@ main {
     display: flex;
     flex-direction: column;
     gap: .6em;
+    text-align: center;
 }
 
 .logo {
-    width:  160px;
-}
-
-.chatbot-conversation-container {
-    height: 250px;
-    overflow-y: scroll;
-    margin: 1em 0;
+    height:  120px;
 }
 
 /* stop ugly scroll bar on some browsers */
